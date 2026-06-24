@@ -9,10 +9,10 @@ main Kuberhealthy application.
 
 - Publishes chart version `1.0.0` from `charts/kuberhealthy`.
 - Preserves the chart behavior from the existing in-tree Kuberhealthy chart.
-- Adds `scripts/test.sh` validation for `helm lint`, `helm template`, and chart
-  packaging.
-- Includes workflow templates for future pull request validation and tag-based
-  GitHub releases once workflow write permission is enabled for this repo.
+- Adds `scripts/test.sh` validation for `helm lint`, `helm template`, chart
+  packaging, stable image defaults, and edge-case rendering.
+- Includes workflow templates for pull request validation and tag-based GitHub
+  releases once workflow write permission is enabled for this repo.
 
 ## Migration
 

@@ -29,11 +29,8 @@ jobs:
             exit 1
           fi
 
-      - name: Lint chart
-        run: helm lint charts/kuberhealthy
-
-      - name: Render chart
-        run: helm template kuberhealthy charts/kuberhealthy --namespace kuberhealthy
+      - name: Test chart
+        run: scripts/test.sh
 
       - name: Package chart
         run: |

@@ -9,10 +9,14 @@ spec:
   selector:
     matchLabels:
       app: {{ template "kuberhealthy.name" . }}
-  {{- if .Values.podDisruptionBudget.minAvailable }}
+  {{- if hasKey .Values.podDisruptionBudget "minAvailable" }}
+  {{- if ne .Values.podDisruptionBudget.minAvailable nil }}
   minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
   {{- end }}
-  {{- if .Values.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+  {{- if hasKey .Values.podDisruptionBudget "maxUnavailable" }}
+  {{- if ne .Values.podDisruptionBudget.maxUnavailable nil }}
   maxUnavailable: {{ .Values.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
   {{- end }}
 {{- end }}

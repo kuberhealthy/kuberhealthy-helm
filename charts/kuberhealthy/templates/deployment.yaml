@@ -98,6 +98,7 @@ spec:
         ports:
         - containerPort: 8080
           name: http
+        {{- if .Values.securityContext.enabled }}
         securityContext:
           runAsNonRoot: {{ .Values.securityContext.runAsNonRoot }}
           runAsUser: {{ .Values.securityContext.runAsUser }}
@@ -111,6 +112,7 @@ spec:
           seccompProfile:
             {{- toYaml .Values.securityContext.seccompProfile | nindent 12 }}
           {{- end }}
+        {{- end }}
         imagePullPolicy: {{ .Values.deployment.imagePullPolicy }}
         livenessProbe:
           httpGet:
