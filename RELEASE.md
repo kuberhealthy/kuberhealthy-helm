@@ -1,18 +1,27 @@
-# v1.0.0
+# v1.0.1
 
-This is the first independently versioned release of the Kuberhealthy Helm
-chart. The chart has moved from `kuberhealthy/kuberhealthy` into this dedicated
-repository so Helm chart changes can be tagged and released separately from the
-main Kuberhealthy application.
+This corrective release supersedes the initial `v1.0.0` chart package. Use
+`v1.0.1` for new installs and upgrades from the first dedicated Kuberhealthy
+Helm chart repository release.
 
 ## Highlights
 
-- Publishes chart version `1.0.0` from `charts/kuberhealthy`.
-- Preserves the chart behavior from the existing in-tree Kuberhealthy chart.
+- Publishes chart version `1.0.1` from `charts/kuberhealthy`.
+- Sets the chart `appVersion` to `v3.0.4` instead of the temporary `main`
+  value in the initial `v1.0.0` package.
+- Preserves the chart behavior from the existing in-tree Kuberhealthy chart
+  while carrying the latest template validation fixes.
 - Adds `scripts/test.sh` validation for `helm lint`, `helm template`, chart
   packaging, stable image defaults, and edge-case rendering.
+- Adds repository LICENSE and NOTICE files.
 - Includes workflow templates for pull request validation and tag-based GitHub
   releases once workflow write permission is enabled for this repo.
+
+## Upgrade notes
+
+`v1.0.0` was published from the first seed commit before the final validation
+fixes landed. Its tag and release asset are left in place for immutability, but
+the recommended chart release is now `v1.0.1`.
 
 ## Migration
 

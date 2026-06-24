@@ -1,7 +1,7 @@
 apiVersion: v2
 name: kuberhealthy
 appVersion: v3.0.4
-version: 1.0.0
+version: 1.0.1
 home: https://kuberhealthy.github.io/kuberhealthy/
 description: "Kuberhealthy v3 operator chart (minimal install)."
 type: application
