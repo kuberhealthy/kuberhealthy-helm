@@ -4,6 +4,25 @@ This repository contains the Kuberhealthy Helm chart. The chart was extracted
 from `kuberhealthy/kuberhealthy/deploy/helm/kuberhealthy` so chart releases can
 use independent version tags.
 
+## Install From The Helm Repository
+
+```sh
+helm repo add kuberhealthy https://raw.githubusercontent.com/kuberhealthy/kuberhealthy-helm/main
+helm repo update
+helm install kuberhealthy kuberhealthy/kuberhealthy \
+  -n kuberhealthy \
+  --create-namespace
+```
+
+## Upgrade From The Helm Repository
+
+```sh
+helm repo add kuberhealthy https://raw.githubusercontent.com/kuberhealthy/kuberhealthy-helm/main
+helm repo update
+helm upgrade kuberhealthy kuberhealthy/kuberhealthy \
+  -n kuberhealthy
+```
+
 ## Install From Source
 
 ```sh
