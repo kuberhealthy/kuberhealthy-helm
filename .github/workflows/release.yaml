@@ -1,0 +1,101 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - v*.*.*
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    name: Package Helm chart
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Verify release tag
+        shell: bash
+        run: |
+          chart_version="$(helm show chart charts/kuberhealthy | awk -F': ' '$1 == "version" { print $2 }')"
+          tag_version="${GITHUB_REF_NAME#v}"
+          if [[ "$chart_version" != "$tag_version" ]]; then
+            echo "tag $GITHUB_REF_NAME does not match chart version $chart_version"
+            exit 1
+          fi
+
+          git fetch origin main:refs/remotes/origin/main
+          main_sha="$(git rev-parse origin/main)"
+          tag_sha="$(git rev-parse HEAD)"
+          if [[ "$tag_sha" != "$main_sha" ]]; then
+            echo "tag $GITHUB_REF_NAME must point at origin/main"
+            echo "tag:  $tag_sha"
+            echo "main: $main_sha"
+            exit 1
+          fi
+
+      - name: Test chart
+        run: scripts/test.sh
+
+      - name: Package chart
+        run: |
+          mkdir -p .cr-release-packages
+          helm package charts/kuberhealthy --destination .cr-release-packages
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" .cr-release-packages/*.tgz \
+            --title "$GITHUB_REF_NAME" \
+            --notes-file RELEASE.md \
+            --draft
+
+      - name: Update Helm repository index and publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cleanup_draft_release() {
+            is_draft="$(gh release view "$GITHUB_REF_NAME" --json isDraft --jq .isDraft 2>/dev/null || true)"
+            if [[ "$is_draft" == "true" ]]; then
+              gh release delete "$GITHUB_REF_NAME" --yes
+            fi
+          }
+
+          trap 'status=$?; if [[ "$status" -ne 0 ]]; then cleanup_draft_release; fi' EXIT
+
+          helm repo index .cr-release-packages \
+            --url "https://github.com/kuberhealthy/kuberhealthy-helm/releases/download/$GITHUB_REF_NAME" \
+            --merge index.yaml
+          cp .cr-release-packages/index.yaml index.yaml
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.yaml
+          index_commit=""
+          if git diff --cached --quiet; then
+            echo "index.yaml is already current"
+          else
+            git commit -m "chore: update Helm repository index for $GITHUB_REF_NAME"
+            index_commit="$(git rev-parse HEAD)"
+            git push origin HEAD:main
+          fi
+
+          if ! gh release edit "$GITHUB_REF_NAME" --draft=false; then
+            echo "failed to publish release; attempting to revert index update"
+            git fetch origin main:refs/remotes/origin/main
+            if [[ -n "$index_commit" && "$(git rev-parse origin/main)" == "$index_commit" ]]; then
+              git revert --no-edit "$index_commit"
+              git push origin HEAD:main
+            else
+              echo "main advanced after index update; manual cleanup required"
+            fi
+            exit 1
+          fi
