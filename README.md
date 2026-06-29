@@ -95,11 +95,9 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
-The release workflow validates the chart, packages it, and attaches the chart
+The pull request workflow validates chart changes with `scripts/test.sh`. The
+release workflow validates the chart, packages it, and attaches the chart
 archive to the GitHub release for the tag.
-
-Workflow templates are available in `workflow-templates/` for repositories that
-have GitHub Actions workflow write permission enabled.
 
 ## Migration From The Main Repository
 
