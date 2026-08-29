@@ -84,6 +84,10 @@ spec:
       tolerations:
 {{ toYaml .Values.deployment.tolerations | indent 8 }}
       {{- end }}
+      {{- with .Values.deployment.topologySpreadConstraints }}
+      topologySpreadConstraints:
+{{ toYaml . | indent 8 }}
+      {{- end }}
       containers:
       {{- if .Values.imageURL }}
       - image: "{{ .Values.imageURL }}"

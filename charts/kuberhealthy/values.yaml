@@ -73,6 +73,16 @@ deployment:
   ## soft: specifies preferences that the scheduler will try to enforce but will not guarantee (Default)
   ## hard: specifies rules that must be met for a pod to be scheduled onto a node
   podAntiAffinity: "hard"
+  ## Zone / hostname topology spread. Empty keeps current scheduling behaviour.
+  ## podAntiAffinity uses kubernetes.io/hostname; it does not replace zone spread.
+  topologySpreadConstraints: []
+  # topologySpreadConstraints:
+  #   - maxSkew: 1
+  #     topologyKey: topology.kubernetes.io/zone
+  #     whenUnsatisfiable: ScheduleAnyway
+  #     labelSelector:
+  #       matchLabels:
+  #         app: kuberhealthy
   customLabels: {}
 
 pod:

@@ -45,6 +45,9 @@ helm upgrade kuberhealthy ./kuberhealthy-helm/charts/kuberhealthy \
 - Set the namespace with `--namespace` or `--create-namespace`.
 - Configure environment variables in `deployment.env`.
 - Adjust replicas and rollout strategy in `deployment`.
+- Set zone topology spread with `deployment.topologySpreadConstraints`. Hostname
+  `podAntiAffinity` does not satisfy a zone constraint. Empty default leaves
+  current scheduling unchanged.
 - The chart enables `KH_LEADER_ELECTION_ENABLED=true` by default so
   `deployment.replicas > 1` stays single-leader for scheduling and reaping.
 - The chart defaults `service.type` to `LoadBalancer`. Use `ClusterIP` for
