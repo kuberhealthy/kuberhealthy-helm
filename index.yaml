@@ -3,6 +3,32 @@ entries:
   kuberhealthy:
   - apiVersion: v2
     appVersion: v3.0.5
+    created: "2026-08-30T09:43:38.297412383Z"
+    description: Kuberhealthy v3 operator chart (minimal install).
+    digest: 3d9ce8fc9c5196c38d657f390c3e59c7dfaa75edee4fb1e8d79589db69905e28
+    home: https://kuberhealthy.github.io/kuberhealthy/
+    icon: https://raw.githubusercontent.com/kuberhealthy/kuberhealthy/main/assets/logo-square.png
+    keywords:
+    - kuberhealthy
+    - kubernetes
+    - operator
+    - monitoring
+    - synthetic
+    - testing
+    - health
+    maintainers:
+    - email: ericgreer@gmail.com
+      name: integrii
+    name: kuberhealthy
+    sources:
+    - https://github.com/kuberhealthy/kuberhealthy-helm
+    - https://github.com/kuberhealthy/kuberhealthy
+    type: application
+    urls:
+    - https://github.com/kuberhealthy/kuberhealthy-helm/releases/download/v1.1.0/kuberhealthy-1.1.0.tgz
+    version: 1.1.0
+  - apiVersion: v2
+    appVersion: v3.0.5
     created: "2026-06-28T02:04:53.096340633Z"
     description: Kuberhealthy v3 operator chart (minimal install).
     digest: 2e371bd1338d4aaaf286eb5c5a55e7bc9ab86378e91813e1658e29551aad1eed
@@ -53,4 +79,4 @@ entries:
     urls:
     - https://github.com/kuberhealthy/kuberhealthy-helm/releases/download/v1.0.1/kuberhealthy-1.0.1.tgz
     version: 1.0.1
-generated: "2026-06-28T02:04:53.079104827Z"
+generated: "2026-08-30T09:43:38.296587742Z"
