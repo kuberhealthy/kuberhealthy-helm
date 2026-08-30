@@ -31,3 +31,19 @@ if ! grep -q 'minAvailable: 0' "$tmp_dir/pdb-zero.yaml"; then
   echo "podDisruptionBudget.minAvailable=0 should render minAvailable: 0"
   exit 1
 fi
+
+# CRD OpenAPI also names this field; check the live objects only.
+helm template kuberhealthy "$chart" --namespace kuberhealthy > "$tmp_dir/no-crds.yaml"
+if grep -q 'topologySpreadConstraints:' "$tmp_dir/no-crds.yaml"; then
+  echo "default render must omit topologySpreadConstraints"
+  exit 1
+fi
+
+helm template kuberhealthy "$chart" \
+  --namespace kuberhealthy \
+  --set-json 'deployment.topologySpreadConstraints=[{"maxSkew":1,"topologyKey":"topology.kubernetes.io/zone","whenUnsatisfiable":"ScheduleAnyway","labelSelector":{"matchLabels":{"app":"kuberhealthy"}}}]' \
+  > "$tmp_dir/tsc.yaml"
+if ! grep -q 'topologyKey: topology.kubernetes.io/zone' "$tmp_dir/tsc.yaml"; then
+  echo "deployment.topologySpreadConstraints should render on the pod spec"
+  exit 1
+fi
