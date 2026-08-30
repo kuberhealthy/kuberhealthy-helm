@@ -1,27 +1,35 @@
-# v1.0.1
+# v1.1.0
 
-This corrective release supersedes the initial `v1.0.0` chart package. Use
-`v1.0.1` for new installs and upgrades from the first dedicated Kuberhealthy
-Helm chart repository release.
+This feature release adds optional Kubernetes topology spread constraints to
+the Kuberhealthy deployment. Use `v1.1.0` for new installs and upgrades from
+the `v1.0.x` chart line.
 
 ## Highlights
 
-- Publishes chart version `1.0.1` from `charts/kuberhealthy`.
-- Sets the chart `appVersion` to `v3.0.4` instead of the temporary `main`
-  value in the initial `v1.0.0` package.
-- Preserves the chart behavior from the existing in-tree Kuberhealthy chart
-  while carrying the latest template validation fixes.
-- Adds `scripts/test.sh` validation for `helm lint`, `helm template`, chart
-  packaging, stable image defaults, and edge-case rendering.
-- Adds repository LICENSE and NOTICE files.
-- Includes workflow templates for pull request validation and tag-based GitHub
-  releases once workflow write permission is enabled for this repo.
+- Publishes chart version `1.1.0` from `charts/kuberhealthy`.
+- Adds the optional `deployment.topologySpreadConstraints` value and renders
+  it on the Kuberhealthy pod specification when configured.
+- Keeps the default scheduling behavior unchanged when the value is empty.
+- Includes chart validation for both the default render and an example zone
+  spread constraint configuration.
 
 ## Upgrade notes
 
-`v1.0.0` was published from the first seed commit before the final validation
-fixes landed. Its tag and release asset are left in place for immutability, but
-the recommended chart release is now `v1.0.1`.
+No values migration is required. Existing `v1.0.x` installations retain their
+current scheduling behavior because `deployment.topologySpreadConstraints`
+defaults to an empty list. To enable topology spreading, set the value in your
+Helm overrides, for example:
+
+```yaml
+deployment:
+  topologySpreadConstraints:
+    - maxSkew: 1
+      topologyKey: topology.kubernetes.io/zone
+      whenUnsatisfiable: ScheduleAnyway
+      labelSelector:
+        matchLabels:
+          app: kuberhealthy
+```
 
 ## Migration
 
@@ -39,4 +47,4 @@ helm install kuberhealthy ./kuberhealthy-helm/charts/kuberhealthy -n kuberhealth
 ```
 
 No Kuberhealthy application image change is included in this chart-only
-release.
+release. The chart `appVersion` remains `v3.0.5`.
