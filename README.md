@@ -73,8 +73,18 @@ helm upgrade kuberhealthy ./kuberhealthy-helm/charts/kuberhealthy \
   --set deployment.prometheusScrape.enabled=false
 ```
 
-If you use Prometheus Operator, apply the ServiceMonitor manifest from the main
-Kuberhealthy repository:
+If you use Prometheus Operator, let the chart create a ServiceMonitor, and add
+the labels your Prometheus `serviceMonitorSelector` matches:
+
+```sh
+helm upgrade kuberhealthy ./kuberhealthy-helm/charts/kuberhealthy \
+  -n kuberhealthy \
+  --set serviceMonitor.enabled=true \
+  --set serviceMonitor.additionalLabels.release=kube-prometheus-stack
+```
+
+You can also apply the ServiceMonitor manifest from the main Kuberhealthy
+repository:
 
 ```sh
 kubectl apply -f https://raw.githubusercontent.com/kuberhealthy/kuberhealthy/main/deploy/serviceMonitor.yaml

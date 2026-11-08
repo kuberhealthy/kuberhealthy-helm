@@ -1,0 +1,37 @@
+{{- if .Values.serviceMonitor.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: {{ template "kuberhealthy.name" . }}
+    {{- with .Values.serviceMonitor.additionalLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  name: {{ template "kuberhealthy.name" . }}
+  namespace: {{ .Values.serviceMonitor.namespace | default .Values.namespace | default .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "kuberhealthy.name" . }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Values.namespace | default .Release.Namespace }}
+  endpoints:
+  - port: http
+    path: {{ .Values.serviceMonitor.path }}
+    {{- with .Values.serviceMonitor.interval }}
+    interval: {{ . }}
+    {{- end }}
+    {{- with .Values.serviceMonitor.scrapeTimeout }}
+    scrapeTimeout: {{ . }}
+    {{- end }}
+    {{- with .Values.serviceMonitor.relabelings }}
+    relabelings:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- with .Values.serviceMonitor.metricRelabelings }}
+    metricRelabelings:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+{{- end }}

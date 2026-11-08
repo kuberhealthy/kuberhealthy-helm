@@ -47,3 +47,20 @@ if ! grep -q 'topologyKey: topology.kubernetes.io/zone' "$tmp_dir/tsc.yaml"; the
   echo "deployment.topologySpreadConstraints should render on the pod spec"
   exit 1
 fi
+
+if grep -q 'kind: ServiceMonitor' "$tmp_dir/no-crds.yaml"; then
+  echo "default render must omit the ServiceMonitor"
+  exit 1
+fi
+
+helm template kuberhealthy "$chart" \
+  --namespace kuberhealthy \
+  --set serviceMonitor.enabled=true \
+  --set serviceMonitor.additionalLabels.release=kube-prometheus-stack \
+  > "$tmp_dir/servicemonitor.yaml"
+for want in 'kind: ServiceMonitor' 'release: kube-prometheus-stack' 'port: http' 'path: /metrics' 'interval: 30s'; do
+  if ! grep -q "$want" "$tmp_dir/servicemonitor.yaml"; then
+    echo "serviceMonitor.enabled=true should render a ServiceMonitor with $want"
+    exit 1
+  fi
+done
