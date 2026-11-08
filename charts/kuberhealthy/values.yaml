@@ -117,3 +117,18 @@ service:
     port: "80"
   loadBalancer:
     provider: ""
+
+## Prometheus Operator ServiceMonitor that scrapes the Kuberhealthy Service.
+## Needs the monitoring.coreos.com/v1 CRDs in the cluster.
+serviceMonitor:
+  enabled: false
+  # Defaults to the namespace of the Service.
+  namespace: ""
+  # Labels a Prometheus serviceMonitorSelector can match, for example
+  # release: kube-prometheus-stack
+  additionalLabels: {}
+  path: /metrics
+  interval: 30s
+  scrapeTimeout: ""
+  relabelings: []
+  metricRelabelings: []
