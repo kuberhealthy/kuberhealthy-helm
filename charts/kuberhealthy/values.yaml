@@ -117,3 +117,21 @@ service:
     port: "80"
   loadBalancer:
     provider: ""
+
+## Ingress to the Kuberhealthy Service, for example with service.type=ClusterIP.
+ingress:
+  enabled: false
+  # IngressClass to use. Empty uses the cluster's default class.
+  className: ""
+  annotations: {}
+  # Host names to route. Empty routes requests for any host.
+  hosts: []
+  # hosts:
+  #   - kuberhealthy.example.com
+  path: /
+  pathType: Prefix
+  tls: []
+  # tls:
+  #   - secretName: kuberhealthy-tls
+  #     hosts:
+  #       - kuberhealthy.example.com
