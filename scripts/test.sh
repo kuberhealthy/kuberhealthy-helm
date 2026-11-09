@@ -32,6 +32,34 @@ if ! grep -q 'minAvailable: 0' "$tmp_dir/pdb-zero.yaml"; then
   exit 1
 fi
 
+if grep -q 'kind: Ingress' "$tmp_dir/default.yaml"; then
+  echo "default render must omit the Ingress"
+  exit 1
+fi
+
+helm template kuberhealthy "$chart" \
+  --namespace kuberhealthy \
+  --set ingress.enabled=true \
+  > "$tmp_dir/ingress-any-host.yaml"
+if grep -q 'host:' "$tmp_dir/ingress-any-host.yaml"; then
+  echo "ingress.enabled=true without hosts should render a rule for any host"
+  exit 1
+fi
+
+helm template kuberhealthy "$chart" \
+  --namespace kuberhealthy \
+  --set ingress.enabled=true \
+  --set ingress.className=nginx \
+  --set 'ingress.hosts[0]=kuberhealthy.example.com' \
+  --set 'ingress.tls[0].secretName=kuberhealthy-tls' \
+  > "$tmp_dir/ingress.yaml"
+for want in 'kind: Ingress' 'ingressClassName: nginx' 'host: "kuberhealthy.example.com"' 'secretName: kuberhealthy-tls' 'number: 80'; do
+  if ! grep -q "$want" "$tmp_dir/ingress.yaml"; then
+    echo "ingress.enabled=true should render an Ingress with $want"
+    exit 1
+  fi
+done
+
 # CRD OpenAPI also names this field; check the live objects only.
 helm template kuberhealthy "$chart" --namespace kuberhealthy > "$tmp_dir/no-crds.yaml"
 if grep -q 'topologySpreadConstraints:' "$tmp_dir/no-crds.yaml"; then
