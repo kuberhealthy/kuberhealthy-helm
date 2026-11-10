@@ -103,6 +103,12 @@ securityContext:
   #seccompProfile:
   #  type: RuntimeDefault
 
+serviceAccount:
+  # Annotations for the Kuberhealthy ServiceAccount, e.g. for IRSA or GKE Workload Identity.
+  annotations: {}
+  # annotations:
+  #   eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/kuberhealthy
+
 # When enabled kuberhealthy will create a PodSecurityPolicy, Role and Binding to match the specified securityContext
 podSecurityPolicy:
   enabled: false

@@ -59,6 +59,9 @@ helm upgrade kuberhealthy ./kuberhealthy-helm/charts/kuberhealthy \
   --set service.type=ClusterIP
 ```
 
+- Add annotations to the ServiceAccount with `serviceAccount.annotations`, for
+  example an IAM role for IRSA or GKE Workload Identity.
+
 ## Prometheus Scraping
 
 By default, the chart adds Prometheus scrape annotations to the Service and pod
