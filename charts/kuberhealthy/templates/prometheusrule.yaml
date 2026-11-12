@@ -1,0 +1,56 @@
+{{- if and .Values.prometheusRule.enabled (or .Values.prometheusRule.defaultRules.enabled .Values.prometheusRule.additionalRules) }}
+{{- $rule := .Values.prometheusRule }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app: {{ template "kuberhealthy.name" . }}
+    {{- with $rule.additionalLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  name: {{ template "kuberhealthy.name" . }}
+  namespace: {{ $rule.namespace | default .Values.namespace | default .Release.Namespace }}
+spec:
+  groups:
+    - name: kuberhealthy.rules
+      rules:
+        {{- if $rule.defaultRules.enabled }}
+        - alert: HealthCheckFailed
+          expr: kuberhealthy_check == 0
+          for: {{ $rule.defaultRules.for }}
+          labels:
+            severity: {{ $rule.defaultRules.severity }}
+            {{- with $rule.defaultRules.labels }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          annotations:
+            summary: HealthCheck failing
+            description: "HealthCheck {{ "{{" }} $labels.check {{ "}}" }} in {{ "{{" }} $labels.namespace {{ "}}" }} is failing."
+        - alert: HealthCheckStale
+          expr: kuberhealthy_check_seconds_since_success > {{ $rule.defaultRules.staleAfterSeconds }}
+          for: {{ $rule.defaultRules.for }}
+          labels:
+            severity: {{ $rule.defaultRules.severity }}
+            {{- with $rule.defaultRules.labels }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          annotations:
+            summary: HealthCheck stale
+            description: "HealthCheck {{ "{{" }} $labels.check {{ "}}" }} in {{ "{{" }} $labels.namespace {{ "}}" }} has not succeeded in the last {{ $rule.defaultRules.staleAfterSeconds }} seconds."
+        - alert: KuberhealthyNoLeader
+          expr: max(kuberhealthy_controller_leader) < 1
+          for: {{ $rule.defaultRules.for }}
+          labels:
+            severity: critical
+            {{- with $rule.defaultRules.labels }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          annotations:
+            summary: Kuberhealthy leader missing
+            description: No Kuberhealthy instance is the leader, so checks may not be running.
+        {{- end }}
+        {{- with $rule.additionalRules }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+{{- end }}
