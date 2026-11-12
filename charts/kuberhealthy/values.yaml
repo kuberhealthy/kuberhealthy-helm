@@ -117,3 +117,25 @@ service:
     port: "80"
   loadBalancer:
     provider: ""
+
+## Prometheus Operator PrometheusRule with alerts for failing and stale checks.
+## Needs the monitoring.coreos.com/v1 CRDs in the cluster.
+prometheusRule:
+  enabled: false
+  # Defaults to the namespace of the release.
+  namespace: ""
+  # Labels a Prometheus ruleSelector can match, for example
+  # release: kube-prometheus-stack
+  additionalLabels: {}
+  # The HealthCheckFailed, HealthCheckStale and KuberhealthyNoLeader alerts.
+  defaultRules:
+    enabled: true
+    for: 5m
+    # Severity of the check alerts. KuberhealthyNoLeader is always critical.
+    severity: warning
+    # How long a check can go without a success before HealthCheckStale fires.
+    staleAfterSeconds: 1800
+    # Extra labels added to every default alert.
+    labels: {}
+  # More rules appended to the group, in PrometheusRule format.
+  additionalRules: []

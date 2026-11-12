@@ -47,3 +47,25 @@ if ! grep -q 'topologyKey: topology.kubernetes.io/zone' "$tmp_dir/tsc.yaml"; the
   echo "deployment.topologySpreadConstraints should render on the pod spec"
   exit 1
 fi
+
+if grep -q 'kind: PrometheusRule' "$tmp_dir/no-crds.yaml"; then
+  echo "default render must not create a PrometheusRule"
+  exit 1
+fi
+
+helm template kuberhealthy "$chart" \
+  --namespace kuberhealthy \
+  --set prometheusRule.enabled=true > "$tmp_dir/prometheusrule.yaml"
+if ! grep -q 'description: "HealthCheck {{ $labels.check }} in {{ $labels.namespace }} is failing."' "$tmp_dir/prometheusrule.yaml"; then
+  echo "prometheusRule.enabled=true should render the default alerts with Prometheus templating intact"
+  exit 1
+fi
+
+helm template kuberhealthy "$chart" \
+  --namespace kuberhealthy \
+  --set prometheusRule.enabled=true \
+  --set prometheusRule.defaultRules.enabled=false > "$tmp_dir/prometheusrule-empty.yaml"
+if grep -q 'kind: PrometheusRule' "$tmp_dir/prometheusrule-empty.yaml"; then
+  echo "a PrometheusRule without any rules must not be rendered"
+  exit 1
+fi

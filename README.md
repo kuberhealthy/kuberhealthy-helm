@@ -80,6 +80,24 @@ Kuberhealthy repository:
 kubectl apply -f https://raw.githubusercontent.com/kuberhealthy/kuberhealthy/main/deploy/serviceMonitor.yaml
 ```
 
+## Alerts
+
+With Prometheus Operator, the chart can also create a PrometheusRule with the
+alerts from the main repository's `docs/prometheus/PROMETHEUS_RULES.yaml`:
+HealthCheckFailed, HealthCheckStale and KuberhealthyNoLeader. Add the labels
+your Prometheus `ruleSelector` matches:
+
+```sh
+helm upgrade kuberhealthy ./kuberhealthy-helm/charts/kuberhealthy \
+  -n kuberhealthy \
+  --set prometheusRule.enabled=true \
+  --set prometheusRule.additionalLabels.release=kube-prometheus-stack
+```
+
+`prometheusRule.defaultRules` sets the `for` duration, the severity and how
+long a check can go without a success before it counts as stale. Your own
+rules go in `prometheusRule.additionalRules`.
+
 ## Release Process
 
 Chart releases are tagged independently from the main Kuberhealthy application
