@@ -1,35 +1,52 @@
-# v1.1.0
+# v1.2.0
 
-This feature release adds optional Kubernetes topology spread constraints to
-the Kuberhealthy deployment. Use `v1.1.0` for new installs and upgrades from
-the `v1.0.x` chart line.
+This feature release adds optional integrations and configuration for exposing
+Kuberhealthy metrics, alerts, service access, and workload identity. Use
+`v1.2.0` for new installs and upgrades from the `v1.1.x` chart line.
 
 ## Highlights
 
-- Publishes chart version `1.1.0` from `charts/kuberhealthy`.
-- Adds the optional `deployment.topologySpreadConstraints` value and renders
-  it on the Kuberhealthy pod specification when configured.
-- Keeps the default scheduling behavior unchanged when the value is empty.
-- Includes chart validation for both the default render and an example zone
-  spread constraint configuration.
+- Publishes chart version `1.2.0` from `charts/kuberhealthy`.
+- Adds an optional Prometheus Operator `ServiceMonitor` for scraping the
+  Kuberhealthy metrics endpoint.
+- Adds an optional Prometheus Operator `PrometheusRule` with alerts for failing
+  and stale HealthChecks, plus support for additional rules.
+- Adds optional `ServiceAccount` annotations for integrations such as AWS IRSA
+  and GKE Workload Identity.
+- Adds an optional `Ingress` with configurable class, annotations, hosts, TLS,
+  and service path settings.
+- Retains the optional `deployment.topologySpreadConstraints` support from
+  `v1.1.0`.
 
 ## Upgrade notes
 
-No values migration is required. Existing `v1.0.x` installations retain their
-current scheduling behavior because `deployment.topologySpreadConstraints`
-defaults to an empty list. To enable topology spreading, set the value in your
-Helm overrides, for example:
+No values migration is required. Existing `v1.1.x` installations retain their
+current behavior because all new integrations are disabled by default. Enable
+the features you need in your Helm overrides. For example:
 
 ```yaml
-deployment:
-  topologySpreadConstraints:
-    - maxSkew: 1
-      topologyKey: topology.kubernetes.io/zone
-      whenUnsatisfiable: ScheduleAnyway
-      labelSelector:
-        matchLabels:
-          app: kuberhealthy
+serviceMonitor:
+  enabled: true
+  additionalLabels:
+    release: kube-prometheus-stack
+
+prometheusRule:
+  enabled: true
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/kuberhealthy
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - kuberhealthy.example.com
 ```
+
+The `ServiceMonitor` and `PrometheusRule` resources require the corresponding
+Prometheus Operator CRDs. Configure `service.externalPort` and `ingress.path`
+to match any custom service exposure requirements.
 
 ## Migration
 
