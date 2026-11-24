@@ -32,6 +32,15 @@ if ! grep -q 'minAvailable: 0' "$tmp_dir/pdb-zero.yaml"; then
   exit 1
 fi
 
+helm template kuberhealthy "$chart" \
+  --namespace kuberhealthy \
+  --set 'serviceAccount.annotations.eks\.amazonaws\.com/role-arn=arn:aws:iam::123456789012:role/kuberhealthy' \
+  > "$tmp_dir/sa-annotations.yaml"
+if ! grep -q 'eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/kuberhealthy' "$tmp_dir/sa-annotations.yaml"; then
+  echo "serviceAccount.annotations should render on the ServiceAccount"
+  exit 1
+fi
+
 # CRD OpenAPI also names this field; check the live objects only.
 helm template kuberhealthy "$chart" --namespace kuberhealthy > "$tmp_dir/no-crds.yaml"
 if grep -q 'topologySpreadConstraints:' "$tmp_dir/no-crds.yaml"; then
