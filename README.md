@@ -62,6 +62,17 @@ helm upgrade kuberhealthy ./kuberhealthy-helm/charts/kuberhealthy \
 - Add annotations to the ServiceAccount with `serviceAccount.annotations`, for
   example an IAM role for IRSA or GKE Workload Identity.
 
+To reach Kuberhealthy through an ingress controller, enable the Ingress:
+
+```sh
+helm upgrade kuberhealthy ./kuberhealthy-helm/charts/kuberhealthy \
+  -n kuberhealthy \
+  --set service.type=ClusterIP \
+  --set ingress.enabled=true \
+  --set ingress.className=nginx \
+  --set 'ingress.hosts[0]=kuberhealthy.example.com'
+```
+
 ## Prometheus Scraping
 
 By default, the chart adds Prometheus scrape annotations to the Service and pod
